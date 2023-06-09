@@ -1,0 +1,281 @@
+{% extends 'department/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap align-items-start">
+                    <div class="me-2">
+                        <h5 class="card-title mb-3">{{object.name}}</h5>
+                    </div>
+                    <div class="dropdown ms-auto">
+                        <a class="text-muted font-size-16" role="button" data-bs-toggle="dropdown" aria-haspopup="true">
+                            <i class="mdi mdi-dots-horizontal"></i>
+                        </a>
+                      
+                        <div class="dropdown-menu dropdown-menu-end">
+                            <a class="dropdown-item" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#change_name"> Nomni o'zgartirish </a>
+                            <a class="dropdown-item" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#change_manager"> Yangi mudir tayinlash </a>
+                            <a class="dropdown-item" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#change_faculty"> Fakultetni almashtirish </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item bg-danger" data-bs-toggle="modal" data-bs-target="#delete_faculty" href="javascript: void();"> O'chirish </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="mt-3">
+                            <p class="text-muted mb-1">Fanlar</p>
+                            <h5>{{science}}</h5>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="mt-3">
+                            <p class="text-muted mb-1"> O'qituvchilar </p>
+                            <h5>{{teachers}}</h5>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <!-- DEKAN -->
+                <br><br>
+                <div>
+                    <h5>Fakulteti</h5>
+                </div>
+                <div class="d-flex">
+                    <a href="{% url 'd_faculty_detail' object.faculty.pk %}">{{object.faculty}}</a>
+                </div>
+                <hr>
+                <!-- DEKAN -->
+                <br><br>
+                <div>
+                    <h5>Kafedra mudiri</h5>
+                </div>
+                <div class="d-flex">
+                    <div class="flex-shrink-0 me-3">
+                        <img src="{% if object.manager.user.image %}{{object.manager.user.image.url}}{% else %}/static/skote/assets/images/users/avatar_default.png{% endif %}" alt="" class="avatar-sm rounded-circle img-thumbnail">
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="text-muted">
+                                    <h5 class="mb-1"> {{object.manager.user.last_name}} {{object.manager.user.first_name}} </h5>
+                                    <p class="mb-0"> {{object.manager.user.username}} </p>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12"><strong>Ism: </strong>{{object.manager.user.first_name}}</div>
+                            <div class="col-12"><strong>Familya: </strong>{{object.manager.user.last_name}}</div>
+                            <div class="col-12"><strong>Otasining ismi: </strong>{{object.manager.user.father_name}}</div>
+                            <div class="col-12"><strong>E-mail: </strong>{{object.manager.user.email}}</div>
+                            <div class="col-12"><strong>Telefon raqami: </strong>{{object.manager.user.phone_number}}</div>
+                            <div class="col-12"><strong>Hodim-ID: </strong>{{object.manager.user.username}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end col -->
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    <div class="me-2">
+                        <h5 class="card-title mb-4"> Ushbu kafedraning o'qituvchilari  </h5>
+                    </div>
+                </div>
+                <div class="table-responsive" style="min-height: 300px;">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="col">Familya / Ism</th>
+                            <th scope="col">Fanlar</th>
+                            <th scope="col">Batafsil</th>
+                          </tr>
+                        </tbody>
+                        <tbody>
+                            {% for i in data %}
+                            <tr>
+                                <td>
+                                    {{i.user.last_name}} {{i.user.first_name}}
+                                </td>
+                                <td>
+                                    {% for j in i.sciences.all %}
+                                        {{j.name}} 
+                                        <br>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <a href="#" class="btn btn-primary btn-sm">Ko'rish</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<!-- Model change name -->
+<div class="modal fade" id="change_name" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_change_name_cafedra' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="change_name"> Kafedra nomini o'zgartirish </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="cafedra_name">Kafedra nomini kiriting</label>
+                <input type="text" required id="cafedra_name" class="form-control" name="cafedra_name" value="{{object.name}}">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Model change name -->
+<div class="modal fade" id="change_faculty" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_change_faculty_cafedra' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="change_faculty"> Fakultetni o'zgartirish </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <label for="faculty_id">Fakultetni tanlang</label>
+                <select name="faculty_id" id="faculty_id" required class="form-select">
+                    <option disabled selected value=""> ... </option>
+                    {% for i in faculty_list %}
+                        <option value="{{i.pk}}">{{i.name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- DELETE faculty modal -->
+<div class="modal fade" id="delete_faculty" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_delete_cafedra' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete_faculty"> Chindan ham ushbu kafedrani o'chirmoqchimisiz ? </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Agarda ushbu kafedrani o'chirsangiz bir qancha ma'lumotlar avtomatik tarzda o'chib ketadi. Bularning barchasi
+                    ushbu kafedraga oid ma'lumotlardir. O'qituvchilar, fanlar va boshqa ma'lumotlar
+                    o'chib ketadi. O'chib ketgan ma'lumotlarni qayta tiklash ilojsizdir. <br><br>
+                    <h6 class="text-primary">Agarda ishonchingiz komil bo'lsa <strong>O'chirib yuborish</strong> tugmasini bosing</h6>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-danger"> O'chirib yuborish </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Change faculty manager modal -->
+<div class="modal fade" id="change_manager" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_change_manager_cafedra' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="change_manager"> Ushbu kafedra uchun yangi mudir tayinlash ? </h5><br>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p> Siz ushbu fakultetga yangi mudir tayinlayabsiz. Eski mudir ma'lumotlari butunlay o'chib ketadi. </p>
+                <div>
+                    {% for i in form %}
+                        <div class="row mb-4">
+                            <label for="{{i.auto_id}}" class="col-sm-3 col-form-label">{{i.label}}</label>
+                            <div class="col-sm-9">
+                                {{i}}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary" id="button_save"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block body_static %}
+    <script>
+        button = document.getElementById("button_save")
+        element = document.getElementById("id_username")
+        element.addEventListener('input', function(e){
+            value = element.value
+            value = value.replace(/\s/g, '');
+            element.value = value
+            $.ajax({
+                method: 'POST',
+                url: '{% url "d_check_username" %}',
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                data: {
+                    q: value,
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(e){
+                    if (e === 'false') {
+                        element.setAttribute('class', 'form-control border border-danger')
+                        button.setAttribute('style', "pointer-events: none;")
+                    } else if (e === 'true') {
+                        element.setAttribute('class', 'form-control')
+                        button.setAttribute('style', "pointer-events: auto;")
+                    }
+                },
+                error: function(e) {}
+            })
+        })
+    </script>
+    <script>
+        function check_password() {
+            button = document.getElementById("button_save")
+            password = document.getElementById("id_password")
+            password2 = document.getElementById("id_password2")
+            if (password2.value === "") 
+                return;
+            if ($('input[name=password]').val() ===  $('input[name=password2]').val()) {
+                password2.setAttribute('class', 'form-control')
+                button.setAttribute('style', "pointer-events: auto;")
+                button.setAttribute('type', "submit")  
+            } else {
+                password2.setAttribute('class', 'form-control border border-danger')
+                button.setAttribute('style', "pointer-events: none;")
+                button.setAttribute('type', "button")
+            }
+        }
+        document.getElementById("id_password").addEventListener('input', check_password)
+        document.getElementById("id_password2").addEventListener('input', check_password)
+    </script>
+{% endblock %}

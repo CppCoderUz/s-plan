@@ -1,0 +1,125 @@
+{% extends 'department/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xl-6">
+                        <div class="product-detai-imgs">
+                            <div class="row">
+                                <div class="col-md-7 offset-md-1 col-sm-9 col-8">
+                                    <div class="text-center">
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#change" class="btn btn-primary waves-effect waves-light mt-2 me-1">
+                                            <i class='bx bxs-pencil'></i> O'zgartirish
+                                        </button>
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#delete_group" class="btn btn-danger waves-effect  mt-2 waves-light">
+                                            <i class='bx bx-trash'></i> O'chirish
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5">
+                    <h5 class="mb-3">To'liq ma'lumot :</h5>
+
+                    <div class="table-responsive">
+                        <table class="table mb-0 table-bordered">
+                            <tbody>
+                                <tr>
+                                    <th scope="row" style="width: 400px;">Guruh nomi</th>
+                                    <td>{{object.name}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Guruh raqami</th>
+                                    <td>{{object.number}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Kurs</th>
+                                    <td>{{object.course}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Semestr</th>
+                                    <td>{{object.semestr}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Guruh kodi</th>
+                                    <td>{{object.code}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Talabalar soni</th>
+                                    <td>{{object.sum_students}}</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Yo'nalishi</th>
+                                    <td> 
+                                        <a href="{% url 'd_detail_direction' object.direction.pk %}">{{object.direction.name}}</a> <br>
+                                        Tili: <strong>{{object.direction.language}}</strong> <br>
+                                        Ta'lim shakli: <strong>{{object.direction.study_form}}</strong> <br>
+                                        Qabul qilingan yil: <strong>{{object.direction.year}}</strong> <br>     
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_group" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_delete_group' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete_group"> Chindan ham ushbu guruhni o'chirmoqchimisiz ? </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Agarda ushbu guruhni o'chirsangiz guruh bilan bog'liq bo'lgan ba'zi ma'lumotlar ham o'chib ketadi.
+                    Ma'lumotlarni qayta tiklab bo'lmaydi.
+                    <br><br>
+                    <h6 class="text-primary">Agarda ishonchingiz komil bo'lsa <strong>O'chirib yuborish</strong> tugmasini bosing</h6>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-danger"> O'chirib yuborish </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="change" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_change_group' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="change"> Guruh ma'lumotlarini o'zgartirish </h5><br>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    {% for i in form %}
+                        <div class="row mb-4">
+                            <label for="{{i.auto_id}}" class="col-sm-3 col-form-label">{{i.label}}</label>
+                            <div class="col-sm-9">
+                                {{i}}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary" id="button_save"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

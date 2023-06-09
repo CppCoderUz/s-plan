@@ -1,0 +1,244 @@
+{% extends 'department/base.html' %}
+{% load utils %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex">
+                    <div class="flex-grow-1">
+                        <div class="d-flex">
+                            <div class="flex-grow-1">
+                                <div class="text-muted">
+                                    <h5 class="mb-1">{{object.name}}</h5>
+                                </div>
+                            </div>
+
+                            <div class="flex-shrink-0 dropdown ms-2">
+                                <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="bx bxs-cog align-middle me-1"></i> Sozlamalar
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a class="dropdown-item" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#change"> O'zgartirish </a>
+                                    <a class="dropdown-item" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#create_group"> Yangi guruh ochish </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item bg-danger" data-bs-toggle="modal" data-bs-target="#delete_direction" href="javascript: void();"> O'chirish </a>
+                                </div>
+                            </div>  
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6><strong>Ta'lim shakli</strong>: {{object.study_form}}</h6>
+                            </div>
+                            <div class="col-12">
+                                <h6>
+                                    <strong>Ta'lim tili</strong>: {{object.language}}
+                                </h6>
+                            </div>
+                            <div class="col-12">
+                                <h6>
+                                    <strong>Qabul qilingan yili</strong>: {{object.year}}
+                                </h6>
+                            </div>
+                            <div class="col-12">
+                                <h6>
+                                    <strong>Yo'nalish kodi</strong>: {{object.code}}
+                                </h6>
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>O'quv rejalar</h6>
+                        <div>
+                            {% for i in object.max_semestr|counter %}
+                            <a href="{% url 'd_plan_init' object.pk i %}" class="btn btn-primary">{{i}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex align-items-start">
+                    <div class="me-2">
+                        <h5 class="card-title mb-4"> Yo'nalishga tegishli guruhlar  </h5>
+                    </div>
+                </div>
+                <div class="table-responsive" style="min-height: 300px;">
+                    <table class="table align-middle table-nowrap mb-0">
+                        <tbody>
+                        <tr>
+                            <th>N</th>
+                            <th scope="col">Nomi</th>
+                            <th scope="col">Talabalar soni</th>
+                            <th scope="col">Guruh kodi</th>
+                            <th scope="col"></th>
+                          </tr>
+                        </tbody>
+                        <tbody>
+                            {% for i in data %}
+                            <tr>
+                                <td>{{forloop.counter}}</td>
+                                <td>
+                                    {{i.name}}
+                                </td>
+                                <td> {{i.sum_students}} </td>
+                                <td> {{i.code}} </td>
+                                <td>
+                                    <a href="{% url 'd_detail_group' i.pk %}" class="btn btn-primary btn-sm">Ko'rish</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="delete_direction" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_delete_direction' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="delete_direction"> Chindan ham ushbu yo'nalishni o'chirmoqchimisiz ? </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Agarda ushbu yo'nalishni o'chirsangiz unga bog'liq bo'lgan barcha ma'lumotlar o'chib ketadi. Ma'lumotlarni
+                    qayta tiklab bo'lmaydi.  
+                    <br><br>
+                    <h6 class="text-primary">Agarda ishonchingiz komil bo'lsa <strong>O'chirib yuborish</strong> tugmasini bosing</h6>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-danger"> O'chirib yuborish </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal fade" id="create_group" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_add_group_for_direction' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="create_group"> Yangi guruh ochish oynasi </h5><br>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    {% for i in create_group_form %}
+                        <div class="row mb-4">
+                            <label for="{{i.auto_id}}" class="col-sm-3 col-form-label">{{i.label}}</label>
+                            <div class="col-sm-9">
+                                {{i}}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary" id="button_save"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="modal fade" id="change" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_change_direction' object.pk %}"> 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="change"> Yo'nalish ma'lumotlarini o'zgartirish </h5><br>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    {% for i in form %}
+                        <div class="row mb-4">
+                            <label for="{{i.auto_id}}" class="col-sm-3 col-form-label">{{i.label}}</label>
+                            <div class="col-sm-9">
+                                {{i}}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary" id="button_save"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block body_static %}
+    <script>
+        button = document.getElementById("button_save")
+        element = document.getElementById("id_username")
+        element.addEventListener('input', function(e){
+            value = element.value
+            value = value.replace(/\s/g, '');
+            element.value = value
+            $.ajax({
+                method: 'POST',
+                url: '{% url "d_check_username" %}',
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                data: {
+                    q: value,
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(e){
+                    if (e === 'false') {
+                        element.setAttribute('class', 'form-control border border-danger')
+                        button.setAttribute('style', "pointer-events: none;")
+                    } else if (e === 'true') {
+                        element.setAttribute('class', 'form-control')
+                        button.setAttribute('style', "pointer-events: auto;")
+                    }
+                },
+                error: function(e) {}
+            })
+        })
+    </script>
+    <script>
+        function check_password() {
+            button = document.getElementById("button_save")
+            password = document.getElementById("id_password")
+            password2 = document.getElementById("id_password2")
+            if (password2.value === "") 
+                return;
+            if ($('input[name=password]').val() ===  $('input[name=password2]').val()) {
+                password2.setAttribute('class', 'form-control')
+                button.setAttribute('style', "pointer-events: auto;")
+                button.setAttribute('type', "submit")  
+            } else {
+                password2.setAttribute('class', 'form-control border border-danger')
+                button.setAttribute('style', "pointer-events: none;")
+                button.setAttribute('type', "button")
+            }
+        }
+        document.getElementById("id_password").addEventListener('input', check_password)
+        document.getElementById("id_password2").addEventListener('input', check_password)
+    </script>
+{% endblock %}
+
+{% block head_static %}
+    <style>
+        .p-r5 {
+            padding-right: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+{% endblock %}

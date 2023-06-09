@@ -1,0 +1,164 @@
+{% extends 'department/base.html' %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title"> 
+                    <div class="row">
+                        <div class="col-6">
+                            Kafedralar ro'yxati
+                        </div>
+                        <div class="col-6" style="display: flex; text-align: end;">
+                            <div class="dropdown ms-auto">
+                                <a class="text-muted font-size-16" role="button" data-bs-toggle="dropdown" aria-haspopup="true">
+                                    <i class="mdi mdi-dots-horizontal"></i>
+                                </a>
+                              
+                                <div class="dropdown-menu dropdown-menu-end">
+                                    <a class="dropdown-item bg-primary" href="javascript: void();" data-bs-toggle="modal" data-bs-target="#add_faculty"> Yangi kafedra qo'shish </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </h4>
+                <p class="card-title-desc"></p>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nomi</th>
+                                <th>Fakulteti</th>
+                                <th>Mudir familya / ismi</th>
+                                <th>Batafsil ko'rish</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in data %}
+                            <tr>
+                                <th scope="row"> {{forloop.counter}} </th>
+                                <td>
+                                    {{ i.name }}
+                                </td>
+                                <td>
+                                    {{ i.faculty.name }}
+                                </td>
+                                <td>
+                                    {{ i.manager.user.last_name }} {{ i.manager.user.first_name }}
+                                </td>
+                                <td> 
+                                    <a href="{% url 'd_detail_cafedra' i.pk %}" class="btn btn-sm btn-primary">Ko'rish</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<!-- add faculty modal -->
+<div class="modal fade bs-example-modal-xl" id="add_faculty" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <form class="modal-content" method="POST" action="{% url 'd_add_cafedra' %}" id="modal_create_form" > 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_faculty"> Yangi kafedra qo'shish </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="row">
+                        {% for i in cafedra_form %}
+                        <div class="col-12">
+                            <label for="{{i.auto_id}}" class="form-label">{{i.label}}</label>
+                            {{i}}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <p><strong>Ushbu qismga kafedra mudirining ma'lumotlarini kiriting</strong></p>
+                    <div class="row">
+                    {% for i in form %}
+                            <div class="col-lg-6">
+                                <label for="{{i.auto_id}}" class="col-sm-3 col-form-label">{{i.label}}</label>
+                                <div class="col-sm-9">
+                                    {{i}}
+                                </div>
+                            </div>
+                    {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+                <button type="submit" class="btn btn-primary" id="button_save"> Saqlash </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block body_static %}
+    <script>
+        button = document.getElementById("button_save")
+        form = document.getElementById("modal_create_form")
+        element = document.getElementById("id_username")
+        element.addEventListener('input', function(e){
+            value = element.value
+            value = value.replace(/\s/g, '');
+            element.value = value
+            $.ajax({
+                method: 'POST',
+                url: '{% url "d_check_username" %}',
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
+                data: {
+                    q: value,
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(e){
+                    if (e === 'false') {
+                        element.setAttribute('class', 'form-control border border-danger')
+                        button.setAttribute('style', "pointer-events: none;")
+                        button.setAttribute('type', "button")
+                    } else if (e === 'true') {
+                        element.setAttribute('class', 'form-control')
+                        button.setAttribute('style', "pointer-events: auto;")
+                        button.setAttribute('type', "submit")
+                    }
+                },
+                error: function(e) {}
+            })
+        })
+    </script>
+    <script>
+        function check_password() {
+            button = document.getElementById("button_save")
+            password = document.getElementById("id_password")
+            password2 = document.getElementById("id_password2")
+            if (password2.value === "") 
+                return;
+            if ($('input[name=password]').val() ===  $('input[name=password2]').val()) {
+                password2.setAttribute('class', 'form-control')
+                button.setAttribute('style', "pointer-events: auto;")
+                button.setAttribute('type', "submit")  
+            } else {
+                password2.setAttribute('class', 'form-control border border-danger')
+                button.setAttribute('style', "pointer-events: none;")
+                button.setAttribute('type', "button")
+            }
+        }
+        document.getElementById("id_password").addEventListener('input', check_password)
+        document.getElementById("id_password2").addEventListener('input', check_password)
+    </script>
+{% endblock %}

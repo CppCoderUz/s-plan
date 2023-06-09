@@ -1,0 +1,440 @@
+{% extends 'department/base.html' %}
+{% load utils %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body border-bottom">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 card-title flex-grow-1">
+                        <span class="text-secondary">
+                            {{direction.name}} | {{direction.faculty.name}} | {{direction.language}}
+                            | {{direction.study_form}} | {{direction.year}}
+
+                            <!-- <select class="js-data-example-ajax form-control" ></select> -->
+                        </span> <br><br>
+                        <strong>
+                            {{semestr_id}} - semestr
+                        </strong>
+                    </h5>
+                    <div class="flex-shrink-0">
+                        <a class="btn btn-primary" onclick="show_form()"> Yangi fan qo'shish </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">Kod</th>
+                                <th scope="col">Fan nomi</th>
+                                <th scope="col">Yakuniy</th>
+                                <th scope="col">Kredit</th>
+                                <th scope="col">Soat</th>
+                                <th scope="col">Maruza</th>
+                                <th scope="col">Amaliy</th>
+                                <th scope="col">Labaratoriya</th>
+                                <th scope="col">Seminar</th>
+                                <th scope="col">Mustaqil<br>ta'lim</th>
+                                <th scope="col">Kurs<br>ishi</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="data_table">
+                            {% for i in data|full_data %}
+                            <tr id="row_{{i.pk}}" class="form_unshow">
+                                <td class="data-view"> {{i.code}} </td>
+                                <td class="data-view">
+                                    {{i.science.name}} <br>
+                                    ( <a href="{% url 'd_detail_cafedra' i.science.pk %}">{{i.science.cafedra.name}}</a>
+                                    )
+                                </td>
+                                <td class="data-view">{{i.form}}</td>
+                                <td class="data-view">{{i.credit}}</td>
+                                <td class="data-view">{{i.hours}}</td>
+                                <td class="data-view">{{i.lecture}}</td>
+                                <td class="data-view">{{i.practice}}</td>
+                                <td class="data-view">{{i.laboratory}}</td>
+                                <td class="data-view">{{i.seminar}}</td>
+                                <td class="data-view">{{i.independent_work}}</td>
+                                <td class="data-view">{{i.course_work}}</td>
+                                <td class="data-view">
+                                    <ul class="list-unstyled hstack gap-1 mb-0">
+                                        <li data-bs-toggle="tooltip" data-bs-placement="top">
+                                            <a href="#" class="btn btn-sm btn-soft-info"
+                                                onclick="show_change_form('{{i.pk}}')"><i
+                                                    class="mdi mdi-pencil-outline"></i></a>
+                                        </li>
+                                        <li data-bs-toggle="tooltip" data-bs-placement="top" aria-label="Delete">
+                                            <a href="#delete_{{i.pk}}" data-bs-toggle="modal"
+                                                class="btn btn-sm btn-soft-danger"><i
+                                                    class="mdi mdi-delete-outline"></i></a>
+                                        </li>
+                                        <!-- DELETE MODAL -->
+                                        <div class="modal fade" id="delete_{{i.pk}}" tabindex="-1"
+                                            aria-labelledby="jobDeleteLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-sm">
+                                                <div class="modal-content">
+                                                    <form class="modal-body px-4 py-5 text-center"
+                                                        action="{% url 'd_delete_plan_row' i.pk %}" method="POST"> {% csrf_token %}
+                                                        <button type="button"
+                                                            class="btn-close position-absolute end-0 top-0 m-3"
+                                                            data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <div class="avatar-sm mb-4 mx-auto">
+                                                            <div
+                                                                class="avatar-title bg-primary text-primary bg-opacity-10 font-size-20 rounded-3">
+                                                                <i class="mdi mdi-trash-can-outline"></i>
+                                                            </div>
+                                                        </div>
+                                                        <p class="text-muted font-size-16 mb-4">
+                                                            Ushbu fanni o'quv rejadan olib tashlamoqchimisiz ?
+                                                            Bazi ma'lumotlarni qayta kiritishga to'g'ri kelishi mumkin.
+                                                            Ishonchingiz komil bo'lsa <span
+                                                                class="text-danger">O'chirish</span>
+                                                            tugmasini bosing
+                                                        </p>
+
+                                                        <div class="hstack gap-2 justify-content-center mb-0">
+                                                            <button type="submit"
+                                                                class="btn btn-danger">O'chirish</button>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Ortga qaytish</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ul>
+                                </td>
+
+                                <!-- CHANGE FORM -->
+                                <form action="{% url 'd_change_plan' direction.pk semestr_id i.pk %}" method="POST" class="tr" novalidate> 
+                                    {% csrf_token %}
+                                    <td class="clear-p-m-b form_col" style="width: 100px !important;">
+                                        <input type="text" name="code_{{i.pk}}" id="code_{{i.pk}}" value="{{i.code}}" class="form-control" required>
+                                    </td>
+                                    <td class="clear-p-m-b form_col" style="width: 200px !important;">
+                                        <select required name="science_{{i.pk}}" id="science_{{i.pk}}"
+                                            class="form-control">
+                                            <option value="{{i.science.pk}}">{{i.science.name}}</option>
+                                        </select>
+                                    </td class="clear-p-m-b">
+                                    <td class="clear-p-m-b form_col">
+                                        <select required name="exam_type_{{i.pk}}" class="form-control">
+                                            <option {% if i.exam_type == 'Imtihon' %} selected {% endif %} value="Imtihon">Imtihon</option>
+                                            <option {% if i.exam_type == 'Sinov' %} selected {% endif %} value="Sinov">Sinov</option>
+                                        </select>
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input required type="number" value="{{i.credit}}" name="credit_{{i.pk}}" id="credit_{{i.pk}}" class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input required type="number" value="{{i.hours}}" name="hours_{{i.pk}}" id="hours_{{i.pk}}" class="form-control"
+                                            style="pointer-events: none;">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input type="number" value="{{i.lecture}}" name="lecture_{{i.pk}}" id="lecture_{{i.pk}}" class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input type="number"  value="{{i.practice}}" name="practice_{{i.pk}}" id="practice_{{i.pk}}" class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input type="number" value="{{i.laboratory}}" name="laboratory_{{i.pk}}" id="laboratory_{{i.pk}}" class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input type="number" value="{{i.seminar}}" name="seminar_{{i.pk}}" id="seminar_{{i.pk}}" class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <input type="number" value="{{i.independent_work}}" name="independent_work_{{i.pk}}" id="independent_work_{{i.pk}}"
+                                            class="form-control">
+                                    </td>
+                                    <td class="clear-p-m-b form_col">
+                                        <select name="course_work_{{i.pk}}" id="course_work_{{i.pk}}" class="form-control"
+                                            onchange="listener()">
+                                            <option {% if i.course_work == "" %} selected {% endif %} value=""></option>
+                                            <option {% if i.course_work == "K" %} selected {% endif %} value="K">K</option>
+                                        </select>
+                                    </td>
+                                    <td class="clear-p-m-b form_col" style="padding-left: 10px !important;">
+                                        <ul class="list-unstyled hstack gap-1 mb-0">
+                                            <li data-bs-toggle="tooltip">
+                                                <button id="save_button_{{i.pk}}" type="submit" href="#"
+                                                    class="btn btn-sm btn-soft-success">
+                                                    <i class='bx bxs-save'></i>
+                                                </button>
+                                            </li>
+                                            <li data-bs-toggle="tooltip">
+                                                <button type="button" onclick="unshow_form('{{i.pk}}')"
+                                                    class="btn btn-sm btn-soft-primary">
+                                                    <i class='bx bx-window-close'></i>
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </form>                                
+                            </tr>
+                            {% endfor %}
+                            <!-- CREATE FORM ROW -->
+                            <form action="{% url 'd_save_plan' direction.pk semestr_id %}" method="POST" class="tr" novalidate>
+                                {% csrf_token %}
+                                <td class="clear-p-m-b" style="width: 100px !important;">
+                                    <input type="text" name="code" id="code" class="form-control" required>
+                                </td>
+                                <td class="clear-p-m-b" style="width: 200px !important;">
+                                    <select required name="science" id="science" class="form-control" onchange="listener()"></select>
+                                </td class="clear-p-m-b">
+                                <td class="clear-p-m-b">
+                                    <select required name="exam_type" class="form-control">
+                                        <option value="Imtihon">Imtihon</option>
+                                        <option value="Sinov">Sinov</option>
+                                    </select>
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input required type="number" name="credit" id="credit" class="form-control">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input required type="number" name="hours" id="hours" class="form-control"
+                                        style="pointer-events: none;">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input type="number" name="lecture" id="lecture" class="form-control">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input type="number" name="practice" id="practice" class="form-control">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input type="number" name="laboratory" id="laboratory" class="form-control">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input type="number" name="seminar" id="seminar" class="form-control">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <input type="number" name="independent_work" id="independent_work"
+                                        class="form-control" style="pointer-events: none;">
+                                </td>
+                                <td class="clear-p-m-b">
+                                    <select name="course_work" id="course_work" class="form-control"
+                                        onchange="listener()">
+                                        <option value=""></option>
+                                        <option value="K">K</option>
+                                    </select>
+                                </td>
+                                <td class="clear-p-m-b" style="padding-left: 10px !important;">
+                                    <ul class="list-unstyled hstack gap-1 mb-0">
+                                        <li data-bs-toggle="tooltip">
+                                            <button id="new_save_button" type="button" href="#"
+                                                class="btn btn-sm btn-soft-success">
+                                                <i class='bx bxs-save'></i>
+                                            </button>
+                                        </li>
+                                        <li data-bs-toggle="tooltip">
+                                            <button type="button" onclick="delete_form()"
+                                                class="btn btn-sm btn-soft-primary">
+                                                <i class='bx bxs-up-arrow'></i>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </td>
+                            </form>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block head_static %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .form_show>.form_col {
+        display: table-cell !important;
+    }
+
+    .form_show>.data-view {
+        display: none !important;
+    }
+
+    .form_unshow>.form_col {
+        display: none !important;
+    }
+
+    .form_unshow>.data-view {
+        display: table-cell !important;
+    }
+
+    .select2-selection__rendered {
+        line-height: 38px !important;
+        max-height: 38px;
+    }
+
+    #select2-science-container {
+        width: 100% !important;
+    }
+
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        max-height: 38px;
+        border-radius: 0;
+        width: 100% !important;
+        border: 1px solid rgb(104, 97, 97);
+        text-align: center;
+    }
+
+    .select2-selection__arrow {
+        height: 100% !important;
+        max-height: 38px;
+    }
+
+    .select2-search__field,
+    .select2-search {
+        border: 2px solid white;
+    }
+
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .tr {
+        display: table-row;
+        vertical-align: inherit;
+    }
+
+    .tr>td {
+        padding: 0 !important;
+    }
+
+    .form-control {
+        display: flex;
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 0;
+    }
+
+    .clear-p-m-b {
+        padding: 0 !important;
+        margin: 0 !important;
+        border-spacing: 0 !important;
+        border: none;
+    }
+
+    .d-none {
+        display: none !important;
+    }
+
+    .select2 {
+        width: 100% !important;
+    }
+</style>
+{% endblock %}
+
+{% block body_static %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $("#science").select2({
+        ajax: {
+            type: "POST",
+            url: "{% url 'd_get_sciense_list' direction.pk semestr_id %}",
+            delay: 100,
+            data: function (params) {
+                return {
+                    filter: params.term,
+                    csrfmiddlewaretoken: "{{csrf_token}}"
+                };
+            },
+            processResults: function (data, params) {
+                return {
+                    results: data.rezult
+                };
+            },
+        },
+    });
+    tr = document.getElementById("data_table").lastChild
+    tr.classList.add("d-none")
+    function show_form() {
+        tr.classList.remove("d-none")
+    }
+    function delete_form() {
+        tr.classList.add("d-none")
+    }
+
+    function solve_data() {
+        hours = document.getElementById("hours").value || 0
+        lecture = document.getElementById("lecture").value || 0
+        practice = document.getElementById("practice").value || 0
+        laboratory = document.getElementById("laboratory").value || 0
+        seminar = document.getElementById("seminar").value || 0
+        independent_work = document.getElementById("independent_work")
+        course_work = document.getElementById("course_work").value
+        if (course_work === "K") course_work = 30
+        else course_work = 0
+        independent_work.value = hours - lecture - practice - laboratory - seminar - course_work
+    }
+
+    function listener() {
+        solve_data();
+        save_button = document.getElementById("new_save_button")
+        code = document.getElementById("code").value || undefined
+        science = document.getElementById("science").value || undefined
+        credit = document.getElementById("credit").value || undefined
+        if (code && science && credit) {
+            save_button.setAttribute("type", "submit")
+        }
+    }
+    document.getElementById("lecture").addEventListener('input', listener);
+    document.getElementById("practice").addEventListener('input', listener);
+    document.getElementById("laboratory").addEventListener('input', listener);
+    document.getElementById("seminar").addEventListener('input', listener);
+
+    document.getElementById("credit").addEventListener('input', function (e) {
+        credit = document.getElementById("credit").value
+        document.getElementById("hours").value = credit * 30
+        listener()
+    })
+
+    function show_change_form(index) {
+        elm = document.getElementById(`row_${index}`)
+        elm.classList.remove("form_unshow")
+        elm.classList.add("form_show")
+    }
+
+    function unshow_form(index) {
+        elm = document.getElementById(`row_${index}`)
+        elm.classList.remove("form_show")
+        elm.classList.add("form_unshow")
+    }
+
+    data_list = [{% for i in data|full_data %} '{{i.pk}}', {% endfor %}]
+
+    for (_ in data_list) {
+        $(`#science_${data_list[_]}`).select2({
+            ajax: {
+                type: "POST",
+                url: "{% url 'd_get_sciense_list' direction.pk semestr_id %}",
+                delay: 100,
+                data: function (params) {
+                    return {
+                        filter: params.term,
+                        csrfmiddlewaretoken: "{{csrf_token}}"
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rezult
+                    };
+                },
+            },
+        });
+    }
+
+
+
+</script>
+{% endblock %}

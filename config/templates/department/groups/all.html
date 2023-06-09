@@ -1,0 +1,120 @@
+{% extends 'department/base.html' %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body border-bottom">
+                <div class="d-flex align-items-center">
+                    <h5 class="mb-0 card-title flex-grow-1"> Guruhlar ro'yxati </h5>
+                    <div class="flex-shrink-0">
+                        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add_direction">Yangi yo'nalish qo'shish</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body border-bottom">
+                
+                <form class="row g-3" method="GET">
+                    <div class="col-xxl-4 col-lg-6 form-group">
+                        <label for="searchInput">Qidirish</label>
+                        <input name="search" type="search" class="form-control" id="searchInput" placeholder="Yo'nalish nomi bo'yicha qidirish ...">
+                    </div>
+                    <div class="col-xxl-2 col-lg-6 form-group" data-select2-id="8">
+                        <label for="select_language">Tili</label>
+                        <select name="language" class="form-control select2 select2-hidden-accessible" data-select2-id="1" tabindex="-1" aria-hidden="true" id="select_language">
+                            <option value=""></option>
+                            <option value="O'zbek">O'zbek</option>
+                            <option value="Rus" >Rus</option>
+                            <option value="Boshqa">Boshqa</option>
+                        </select>
+                    </div>
+                    <div class="col-xxl-2 col-lg-4 form-group" data-select2-id="18">
+                        <label for="s_form"> Ta'lim shakli </label>
+                        <select name="form" class="form-control select2 select2-hidden-accessible" data-select2-id="4" tabindex="-1" aria-hidden="true" id="s_form">
+                            <option value=""></option>
+                            <option value="Kunduzgi">Kunduzgi</option>
+                            <option value="Kechki">Kechki</option>
+                            <option value="Sirtqi">Sirtqi</option>
+                        </select>
+                    </div>
+                    <div class="col-xxl-2 col-lg-4 form-group">
+                        <label for="year_s">Yili</label>
+                        <input type="number" name="year" id="year_s" class="form-control">
+                    </div>
+                    <div class="col-xxl-2 col-lg-4 form-group">
+                        <label for="w">_</label><br>
+                        <input type="submit" value="Filterlash" class="btn btn-primary" id="w">
+                    </div>
+                </form>
+
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle nowrap">
+                        <thead>
+                            <tr>
+                                <th scope="col">Guruh nomi</th>
+                                <th scope="col">Yo'nalishi</th>
+                                <th scope="col">Guruh kodi</th>
+                                <th scope="col">Tili</th>
+                                <th scope="col">Ta'lim shakli</th>
+                                <th scope="col">Qabul qilingan yili</th>
+                                <th scope="col">Talabalar soni</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in data %}
+                            <tr>
+                                <td>{{i.name}}</td>
+                                <td>{{i.direction.name}}</td>
+                                <td>{{i.code}}</td>
+                                <td>{{i.direction.language}}</td>
+                                <td>{{i.direction.study_form}}</td>
+                                <td>{{i.direction.year}}</td>
+                                <td>{{i.sum_students}}</td>
+                                <td><a href="{% url 'd_detail_group' i.pk %}" class="btn btn-primary">Ko'rish</a></td>
+                            </tr>
+                           {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODALS -->
+<!-- add group modal -->
+<div class="modal fade bs-example-modal-xl" id="add_direction" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+        <form class="modal-content" method="POST" id="modal_create_form" > 
+            {% csrf_token %}
+            <div class="modal-header">
+                <h5 class="modal-title" id="add_direction"> Yangi guruh qo'shish </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <h5>Yangi guruh qo'shish qo'llanmasi</h5>
+                    <p>
+                        Yangi guruh qo'shish uchun, yo'nalishlar ro'yxatidan o'zingizga kerakli deb hisoblagan yo'nalishni tanlang. Undan
+                        keyin <span class="text-success">Ko'rish</span> tugmasini bosing. Yo'nalish sozlamalaridan <span class="text-primary">Yangi guruh ochish</span>
+                        parametrini tanlang. Chiqqan formani to'ldirish orqali aynan tanlangan yo'nalish uchun guruh qo'sha olasiz. 
+                        <br> <br>
+                        <a href="{% url 'd_all_direction' %}">Yo'nalishlar ro'yxatiga link </a>
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Ortga qaytish</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+
